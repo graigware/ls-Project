@@ -11,8 +11,10 @@
 #ifndef PROJECT_H
     #define PROJECT_H
 
-void dash_l(char const *path);
+int dash_l(char const *path);
 
-void dash_a(char const *path);
+int dash_a(char const *path);
+
+int is_file(const char *path);
 
 #endif

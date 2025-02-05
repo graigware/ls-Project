@@ -12,26 +12,25 @@
 #include <dirent.h>
 #include <stdio.h>
 
-void dash_a(char const *path)
+int dash_a(char const *path)
 {
     DIR *directory;
     struct dirent *entry;
 
-    (void)path;
-    directory = opendir(".");
-    if (directory == NULL) {
-        return;
-    }
+    if (is_file(path) == 1)
+        my_printf("%s\n", path);
+    directory = opendir(path);
+    if (!directory)
+        return 84;
     entry = readdir(directory);
+    if (!entry) {
+        closedir(directory);
+        return 84;
+    }
     while (entry != NULL) {
-        if (entry->d_name[0] == '.' || entry->d_name[0] != '.') {
-            my_printf("%s ", entry->d_name);
-        }
+        my_printf("%s\n", entry->d_name);
         entry = readdir(directory);
     }
-    if (closedir(directory) == -1) {
-        return;
-    }
-    my_putchar('\n');
-    return;
+    closedir(directory);
+    return 0;
 }

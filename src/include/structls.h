@@ -9,8 +9,8 @@
     #define STRUCTLS_H
 
 typedef struct {
-    char arguments;
-    void (*dash)(char const *path);
+    char flags;
+    int (*dash)(char const *path);
 } dash_t;
 
 #endif

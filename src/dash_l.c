@@ -7,7 +7,7 @@
 #include "include/lib.h"
 #include "include/structls.h"
 #include "include/printf.h"
-#include "include/structid.h"
+#include "include/project.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -64,15 +64,13 @@ static int process_entry(const char *path, const struct dirent *entry)
     struct stat stats;
     char filepath[256];
 
-    if (entry->d_name[0] == '.') {
+    if (entry->d_name[0] == '.')
         return 0;
-    }
     my_strncpy(filepath, path, sizeof(filepath));
     my_strcat(filepath, "/");
     my_strcat(filepath, entry->d_name);
-    if (stat(filepath, &stats) == -1) {
+    if (stat(filepath, &stats) == -1)
         return 0;
-    }
     return stats.st_blocks / 2;
 }
 
@@ -82,10 +80,13 @@ static int link_number(const char *path)
     struct dirent *entry;
     int links = 0;
 
-    if (directory == NULL) {
-        return 0;
-    }
+    if (!directory)
+        return 84;
     entry = readdir(directory);
+    if (!entry) {
+        closedir(directory);
+        return 84;
+    }
     while (entry != NULL) {
         links += process_entry(path, entry);
         entry = (readdir(directory));
@@ -94,7 +95,7 @@ static int link_number(const char *path)
     return links;
 }
 
-static void process_directory_entry(const char *path, struct dirent *entry)
+static int process_directory_entry(const char *path, struct dirent *entry)
 {
     struct stat stats;
     char filepath[256];
@@ -102,36 +103,41 @@ static void process_directory_entry(const char *path, struct dirent *entry)
     my_strncpy(filepath, path, sizeof(filepath));
     my_strcat(filepath, "/");
     my_strcat(filepath, entry->d_name);
-    if (stat(filepath, &stats) == -1) {
-        return;
-    }
+    if (stat(filepath, &stats) == -1)
+        return 84;
     display_file_info(&stats, entry->d_name);
+    return 0;
 }
 
-static void process_directory(DIR *directory, const char *path)
+static int process_directory(DIR *directory, const char *path)
 {
     struct dirent *entry;
 
+    if (!directory)
+        return 84;
     entry = readdir(directory);
+    if (!entry) {
+        closedir(directory);
+        return 84;
+    }
     while (entry != NULL) {
         if (entry->d_name[0] != '.') {
             process_directory_entry(path, entry);
         }
         entry = readdir(directory);
     }
+    return 0;
 }
 
-void dash_l(const char *path)
+int dash_l(const char *path)
 {
-    DIR *directory;
+    DIR *directory = opendir(path);
     int links;
 
-    directory = opendir(path);
-    if (directory == NULL) {
-        return;
-    }
+    if (!directory)
+        return 84;
     links = link_number(path);
     my_printf("total %d\n", links);
     process_directory(directory, path);
-    closedir(directory);
+    return 0;
 }
