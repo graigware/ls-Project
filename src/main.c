@@ -36,7 +36,10 @@ int is_file(const char *path)
     struct stat stats;
 
     if (stat(path, &stats) != 0) {
-        my_printf("my_ls: cannot access 'lala': No such file or directory\n");
+        my_printf("my_ls: cannot access '");
+        my_printf(path, my_strlen(path));
+        my_printf("': ");
+        perror("");
         return 84;
     } else
         return S_ISREG(stats.st_mode);
