@@ -131,9 +131,10 @@ static int process_directory(DIR *directory, const char *path)
 
 int dash_l(const char *path)
 {
-    DIR *directory = opendir(path);
+    DIR *directory;
     int links;
 
+    directory = opendir(path);
     if (!directory)
         return 84;
     links = link_number(path);

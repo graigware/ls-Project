@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <string.h>
 #include "include/lib.h"
 #include "include/printf.h"
 #include "include/structid.h"
@@ -36,13 +37,10 @@ int is_file(const char *path)
     struct stat stats;
 
     if (stat(path, &stats) != 0) {
-        my_printf("my_ls: cannot access '");
-        my_printf(path, my_strlen(path));
-        my_printf("': ");
         perror("");
         return 84;
-    } else
-        return S_ISREG(stats.st_mode);
+    }
+    return S_ISREG(stats.st_mode);
 }
 
 int open_files(const char *path)
@@ -88,8 +86,14 @@ int main(int ac, char **av)
             display_content(av, i);
         }
     }
+    if ((has_flag))
+        for (int i = 1; i < ac; i++)
+            return dash_l(av[i]);
+    if ((has_flag))
+        for (int i = 1; i < ac; i++)
+            return dash_a(av[i]);
     if (!has_flag)
         for (int i = 1; i < ac; i++)
-            open_files(av[i]);
+            return open_files(av[i]);
     return 0;
 }
